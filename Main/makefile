@@ -1,2 +1,4 @@
 build:
-	go build -o LibraryManagementSystem && ./LibraryManagementSystem
+	go build -o LibraryManagementSystem
+run: 
+	./LibraryManagementSystem
