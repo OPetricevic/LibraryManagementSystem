@@ -1,4 +1,4 @@
-module mod
+module github.com/OPetricevic/LibraryManagementSystem
 
 go 1.21.4
 
