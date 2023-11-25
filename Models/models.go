@@ -8,12 +8,14 @@ import (
 )
 
 type User struct {
-	ID        uuid.UUID `gorm:"type:uuid;primary_key;"` // Use UUID as primary key
+	ID        uuid.UUID `gorm:"type:uuid;primary_key;"` 
 	CreatedAt time.Time
 	UpdatedAt time.Time
 	DeletedAt gorm.DeletedAt `gorm:"index"`
 
-	Email    string `gorm:"unique"`
-	Password string
-	APIKey   string `gorm:"unique"` // Ensure APIKey is unique
+	FirstName string `gorm:"type:varchar(50)"`
+    LastName  string `gorm:"type:varchar(50)"`
+    Email     string `gorm:"type:varchar(255);unique;index"`
+    Password  string 
+    APIKey    string `gorm:"type:varchar(64);unique;index"`
 }
