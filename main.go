@@ -9,7 +9,7 @@ import (
 	handlers "github.com/OPetricevic/LibraryManagementSystem/Handlers"
 	models "github.com/OPetricevic/LibraryManagementSystem/Models"
 	repository "github.com/OPetricevic/LibraryManagementSystem/Repository"
-	routes "github.com/OPetricevic/LibraryManagementSystem/Routes"
+	"github.com/gorilla/mux"
 	"github.com/joho/godotenv"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
@@ -46,11 +46,11 @@ func main() {
 	userRepo := repository.NewUserRepository(db)
 	userController := handlers.NewUserController(userRepo)
 
-	mux := http.NewServeMux()
-	routes.RegisterRoutes(mux, userController)
+	r := mux.NewRouter()
+	r.HandleFunc("/register", userController.Register).Methods("POST")
 
 	fmt.Printf("Server is running")
-	err = http.ListenAndServe(":6666", mux)
+	err = http.ListenAndServe(":6666", r)
 	if err != nil {
 		log.Fatal("Failed to start server", err)
 	}
