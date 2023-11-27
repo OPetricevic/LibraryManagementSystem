@@ -7,5 +7,5 @@ import (
 )
 
 func RegisterRoutes(mux *http.ServeMux, uc *handlers.UserController) {
-	mux.Handler("register", uc.Register)
+	mux.HandleFunc("register", uc.Register)
 }
