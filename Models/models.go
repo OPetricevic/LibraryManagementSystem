@@ -17,10 +17,10 @@ type User struct {
 	UpdatedAt time.Time
 	DeletedAt gorm.DeletedAt `gorm:"index"`
 
-	FirstName string `gorm:"type:varchar(50)"`
-	LastName  string `gorm:"type:varchar(50)"`
-	Email     string `gorm:"type:varchar(255);unique;index"`
-	Password  string
+	FirstName string `gorm:"type:varchar(50);not null"`
+	LastName  string `gorm:"type:varchar(50);not null"`
+	Email     string `gorm:"type:varchar(255);unique;index;not null"`
+	Password  string `gorm:"not null"`
 	APIKey    string `gorm:"type:varchar(64);unique;index"`
 }
 
@@ -29,7 +29,6 @@ func (u *User) BeforeCreate(tx *gorm.DB) error {
 	var err error
 	u.ID, err = generateUUID()
 	if err != nil {
-		// Log the error and return a generic error message
 		log.Printf("Error generating UUID: %v", err)
 		return errors.New("failed to generate a unique identifier")
 	}
