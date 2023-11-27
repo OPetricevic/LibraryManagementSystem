@@ -1,27 +1,29 @@
 package models
 
 import (
-	"crypto/rand"
-	"encoding/base64"
 	"errors"
 	"log"
 	"time"
 
-	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
 type User struct {
-	ID        string         `gorm:"type:char(36);primary_key;" valid:"-"`
-	CreatedAt time.Time      `valid:"-"`
-	UpdatedAt time.Time      `valid:"-"`
-	DeletedAt gorm.DeletedAt `gorm:"index" valid:"-"`
+	ID        string         `gorm:"type:char(36);primary_key;" json:"id" valid:"-"`
+	CreatedAt time.Time      `json:"created_at" valid:"-"`
+	UpdatedAt time.Time      `json:"updated_at" valid:"-"`
+	DeletedAt gorm.DeletedAt `gorm:"index" json:"deleted_at" valid:"-"`
 
-	FirstName string `gorm:"type:varchar(50);not null" valid:"required,alpha"`
-	LastName  string `gorm:"type:varchar(50);not null" valid:"required,alpha"`
-	Email     string `gorm:"type:varchar(255);unique;index;not null" valid:"required,email"`
-	Password  string `gorm:"not null" valid:"required"`
-	APIKey    string `gorm:"type:varchar(64);unique;index" valid:"-"`
+	FirstName string `gorm:"type:varchar(50);not null" json:"first_name" valid:"required,alpha"`
+	LastName  string `gorm:"type:varchar(50);not null" json:"last_name" valid:"required,alpha"`
+	Email     string `gorm:"type:varchar(255);unique;index;not null" json:"email" valid:"required,email"`
+	Password  string `gorm:"not null" json:"password" valid:"required"`
+	APIKey    string `gorm:"type:varchar(64);unique;index" json:"api_key" valid:"-"`
+}
+
+type LoginUser struct {
+	Email    string `json:"email"`
+	Password string `json:"password"`
 }
 
 // BeforeCreate pravi UUID
@@ -39,21 +41,4 @@ func (u *User) BeforeCreate(tx *gorm.DB) error {
 		return errors.New("failed to generate an API key")
 	}
 	return nil
-}
-
-func generateUUID() (string, error) {
-	id, err := uuid.NewRandom()
-	if err != nil {
-		return "", err
-	}
-	return id.String(), nil
-}
-
-func generateAPIKey() (string, error) {
-	b := make([]byte, 32)
-	_, err := rand.Read(b)
-	if err != nil {
-		return "", err
-	}
-	return base64.URLEncoding.EncodeToString(b), nil
 }

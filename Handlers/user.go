@@ -3,6 +3,7 @@ package handlers
 import (
 	"encoding/json"
 	"net/http"
+	"strings"
 
 	"github.com/asaskevich/govalidator"
 	"golang.org/x/crypto/bcrypt"
@@ -25,15 +26,21 @@ func (uc *UserController) Register(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Invalid request body", http.StatusBadRequest)
 		return
 	}
-	//Here I'm defining with govalidator if the user information that we are reading in the correct format that is defined in models.go
+	var errorMsgs []string // Declare the errorMsgs variable
+
+	// Check if the user information is in the correct format defined in models.go
 	if _, err := govalidator.ValidateStruct(user); err != nil {
-		http.Error(w, err.Error(), http.StatusBadGateway)
-		return
+		errorMsgs = append(errorMsgs, strings.Split(err.Error(), ";")...)
 	}
 
-	//Checking if the password is 8 chars, has special char/number/uppercase.
+	// Check if the password meets complexity requirements
 	if err := validatePassword(user.Password); err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		errorMsgs = append(errorMsgs, "Invalid password")
+	}
+
+	if len(errorMsgs) > 0 {
+		formattedMsg := strings.Join(errorMsgs, "\n")
+		http.Error(w, formattedMsg, http.StatusBadRequest)
 		return
 	}
 
@@ -48,4 +55,8 @@ func (uc *UserController) Register(w http.ResponseWriter, r *http.Request) {
 	if err := uc.Repo.CreateUser(&user); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
+
+	response := map[string]string{"message": "Registered successfully"}
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(response)
 }
