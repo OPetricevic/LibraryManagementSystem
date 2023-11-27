@@ -31,11 +31,18 @@ func (uc *UserController) Register(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	//Checking if the password is 8 chars, has special char/number/uppercase.
+	if err := validatePassword(user.Password); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
 	if err != nil {
 		http.Error(w, "Failed to create account", http.StatusInternalServerError)
 		return
 	}
+	//Converting the password into a hashable string.
 	user.Password = string(hashedPassword)
 
 	if err := uc.Repo.CreateUser(&user); err != nil {
