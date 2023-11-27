@@ -23,11 +23,11 @@ func (r *UserRepository) GetUserByEmail(email string) (*models.User, error) {
 	var user models.User
 	result := r.Db.Where("email = ?", email).First(&user)
 	if result.Error != nil {
-		if result.Error == gorm.ErrRecordNotFound {
-			//User not found
+		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+			// User not found
 			return nil, errors.New("user not found")
 		}
-		//other database error
+		// Other database error
 		return nil, result.Error
 	}
 	return &user, nil

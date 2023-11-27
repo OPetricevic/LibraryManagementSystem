@@ -15,10 +15,17 @@ import (
 	"gorm.io/gorm"
 )
 
+var jwtSecretKey []byte
+
 func main() {
+
 	err := godotenv.Load()
 	if err != nil {
 		log.Fatal("Error loading .env file.")
+	}
+	jwtSecretKey = []byte(os.Getenv("JWT_SECRET_KEY"))
+	if len(jwtSecretKey) == 0 {
+		log.Fatal("JWT secret key must be set")
 	}
 
 	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local",
@@ -39,10 +46,11 @@ func main() {
 	}
 
 	userRepo := repository.NewUserRepository(db)
-	userController := handlers.NewUserController(userRepo)
+	userController := handlers.NewUserController(userRepo, jwtSecretKey)
 
 	r := mux.NewRouter()
 	r.HandleFunc("/register", userController.Register).Methods("POST")
+	r.HandleFunc("/login", userController.Login).Methods("POST")
 
 	fmt.Printf("Server is running")
 	err = http.ListenAndServe(":6666", r)

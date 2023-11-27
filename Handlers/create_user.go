@@ -13,11 +13,17 @@ import (
 )
 
 type UserController struct {
-	Repo *repository.UserRepository
+	Repo         *repository.UserRepository
+	jwtSecretKey []byte
 }
 
-func NewUserController(repo *repository.UserRepository) *UserController {
-	return &UserController{Repo: repo}
+// In handlers package
+
+func NewUserController(repo *repository.UserRepository, jwtSecretKey []byte) *UserController {
+	return &UserController{
+		Repo:         repo,
+		jwtSecretKey: jwtSecretKey,
+	}
 }
 
 func (uc *UserController) Register(w http.ResponseWriter, r *http.Request) {
