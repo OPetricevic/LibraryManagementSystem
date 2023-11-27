@@ -1,6 +1,10 @@
 package models
 
 import (
+	"crypto/rand"
+	"encoding/base64"
+	"errors"
+	"log"
 	"time"
 
 	"github.com/google/uuid"
@@ -21,7 +25,36 @@ type User struct {
 }
 
 // BeforeCreate pravi UUID
-func (u *User) BeforeCreate(tx *gorm.DB) (err error) {
-	u.ID = uuid.New().String()
-	return
+func (u *User) BeforeCreate(tx *gorm.DB) error {
+	var err error
+	u.ID, err = generateUUID()
+	if err != nil {
+		// Log the error and return a generic error message
+		log.Printf("Error generating UUID: %v", err)
+		return errors.New("failed to generate a unique identifier")
+	}
+
+	u.APIKey, err = generateAPIKey()
+	if err != nil {
+		log.Printf("Error generating API key: %v", err)
+		return errors.New("failed to generate an API key")
+	}
+	return nil
+}
+
+func generateUUID() (string, error) {
+	id, err := uuid.NewRandom()
+	if err != nil {
+		return "", err
+	}
+	return id.String(), nil
+}
+
+func generateAPIKey() (string, error) {
+	b := make([]byte, 32)
+	_, err := rand.Read(b)
+	if err != nil {
+		return "", err
+	}
+	return base64.URLEncoding.EncodeToString(b), nil
 }
