@@ -12,16 +12,16 @@ import (
 )
 
 type User struct {
-	ID        string `gorm:"type:char(36);primary_key;"` // Changed from uuid.UUID to string
-	CreatedAt time.Time
-	UpdatedAt time.Time
-	DeletedAt gorm.DeletedAt `gorm:"index"`
+	ID        string         `gorm:"type:char(36);primary_key;" valid:"-"`
+	CreatedAt time.Time      `valid:"-"`
+	UpdatedAt time.Time      `valid:"-"`
+	DeletedAt gorm.DeletedAt `gorm:"index" valid:"-"`
 
-	FirstName string `gorm:"type:varchar(50);not null"`
-	LastName  string `gorm:"type:varchar(50);not null"`
-	Email     string `gorm:"type:varchar(255);unique;index;not null"`
-	Password  string `gorm:"not null"`
-	APIKey    string `gorm:"type:varchar(64);unique;index"`
+	FirstName string `gorm:"type:varchar(50);not null" valid:"required,alpha"`
+	LastName  string `gorm:"type:varchar(50);not null" valid:"required,alpha"`
+	Email     string `gorm:"type:varchar(255);unique;index;not null" valid:"required,email"`
+	Password  string `gorm:"not null" valid:"required"`
+	APIKey    string `gorm:"type:varchar(64);unique;index" valid:"-"`
 }
 
 // BeforeCreate pravi UUID
