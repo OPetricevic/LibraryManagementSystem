@@ -11,6 +11,7 @@ import (
 	repository "github.com/OPetricevic/LibraryManagementSystem/Repository"
 	"github.com/gorilla/mux"
 	"github.com/joho/godotenv"
+	"golang.org/x/crypto/bcrypt"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
@@ -45,6 +46,8 @@ func main() {
 		log.Fatal("Failed to automigrate", err)
 	}
 
+	ensureAdminUserExists(db)
+
 	userRepo := repository.NewUserRepository(db)
 	userController := handlers.NewUserController(userRepo, jwtSecretKey)
 
@@ -56,5 +59,28 @@ func main() {
 	err = http.ListenAndServe(":6666", r)
 	if err != nil {
 		log.Fatal("Failed to start server", err)
+	}
+}
+
+func ensureAdminUserExists(db *gorm.DB) {
+	defaultAdminEmail := os.Getenv("DEFAULT_ADMIN_EMAIL")
+	defaultAdminPassword := os.Getenv("DEFAULT_ADMIN_PASSWORD")
+	defaultAdminName := os.Getenv("DEFAULT_ADMIN_NAME")
+
+	//Checks if an Admin acc exists
+	var count int64
+	db.Model(&models.User{}).Where("role = ?", "admin").Count(&count)
+	if count == 0 {
+		//Admin doesn't exist so we create one
+		hashedPassword, _ := bcrypt.GenerateFromPassword([]byte(defaultAdminPassword), bcrypt.DefaultCost)
+		adminUser := models.User{
+			Email:     defaultAdminEmail,
+			Password:  string(hashedPassword),
+			Role:      "admin",
+			FirstName: defaultAdminName,
+			LastName:  defaultAdminName,
+		}
+		db.Create(&adminUser)
+
 	}
 }
