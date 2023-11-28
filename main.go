@@ -55,6 +55,8 @@ func main() {
 	r.HandleFunc("/register", userController.Register).Methods("POST")
 	r.HandleFunc("/login", userController.Login).Methods("POST")
 
+	//	r.HandleFunc("/admin/users", adminController.GetAllUsers).Methods("GET").Use(JWTAdminAuthMiddleware)
+
 	fmt.Printf("Server is running")
 	err = http.ListenAndServe(":6666", r)
 	if err != nil {
