@@ -18,6 +18,7 @@ type User struct {
 	LastName  string `gorm:"type:varchar(50);not null" json:"last_name" valid:"required,alpha"`
 	Email     string `gorm:"type:varchar(255);unique;index;not null" json:"email" valid:"required,email"`
 	Password  string `gorm:"not null" json:"password" valid:"required"`
+	Role      string `gorm:"type:varchar(20);default:'user'"` //Dodatak za usere radi admin privilegija
 }
 
 type LoginRequest struct {
