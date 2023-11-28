@@ -60,6 +60,7 @@ func main() {
 	adminRoute := r.PathPrefix("/admin").Subrouter()
 	adminRoute.Use(middleware.JWTAdminAuthMiddleware(jwtSecretKey))             // Apply JWT middleware to all admin routes
 	adminRoute.HandleFunc("/users", adminController.GetAllUsers).Methods("GET") // Register the GetAllUsers endpoint
+	adminRoute.HandleFunc("/users/{id}", adminController.UpdateUser).Methods("PUT", "PATCH")
 
 	fmt.Printf("Server is running")
 	err = http.ListenAndServe(":6666", r)

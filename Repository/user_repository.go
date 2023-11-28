@@ -4,6 +4,7 @@ import (
 	"errors"
 
 	models "github.com/OPetricevic/LibraryManagementSystem/Models"
+	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 )
 
@@ -40,4 +41,31 @@ func (r *UserRepository) GetAllUsers() ([]models.AllUserInformation, error) {
 		return nil, result.Error
 	}
 	return users, nil
+}
+
+func (r *UserRepository) UpdateUserByID(userID string, updateData models.UserUpdateRequest) error {
+
+	updates := make(map[string]interface{})
+
+	if updateData.FirstName != "" {
+		updates["first_name"] = updateData.FirstName
+	}
+	if updateData.LastName != "" {
+		updates["last_name"] = updateData.LastName
+	}
+	if updateData.Email != "" {
+		updates["email"] = updateData.Email
+	}
+	if updateData.Role != "" {
+		updates["role"] = updateData.Role
+	}
+	if updateData.Password != "" {
+		hashedPassword, err := bcrypt.GenerateFromPassword([]byte(updateData.Password), bcrypt.DefaultCost)
+		if err != nil {
+			return err
+		}
+		updates["password"] = string(hashedPassword)
+	}
+
+	return r.Db.Model(&models.User{}).Where("id = ?", userID).Updates(updates).Error
 }

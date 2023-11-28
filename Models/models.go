@@ -37,11 +37,6 @@ func (u *User) BeforeCreate(tx *gorm.DB) error {
 	return nil
 }
 
-type UpdateUser struct {
-	Email string `json:"email"`
-	Role  string `json:"role"`
-}
-
 type AllUserInformation struct {
 	ID        string `json:"id"`
 	FirstName string `json:"first_name"`
@@ -52,4 +47,12 @@ type AllUserInformation struct {
 
 func (AllUserInformation) TableName() string {
 	return "users"
+}
+
+type UserUpdateRequest struct {
+	FirstName string `json:"first_name,omitempty"`
+	LastName  string `json:"last_name,omitempty"`
+	Email     string `json:"email,omitempty"`
+	Role      string `json:"role,omitempty"`
+	Password  string `json:"password,omitempty"`
 }
