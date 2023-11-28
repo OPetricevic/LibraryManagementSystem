@@ -32,3 +32,12 @@ func (r *UserRepository) GetUserByEmail(email string) (*models.User, error) {
 	}
 	return &user, nil
 }
+
+func (r *UserRepository) GetAllUsers() ([]models.AllUserInformation, error) {
+	var users []models.AllUserInformation
+	result := r.Db.Find(&users) // This will find all records
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	return users, nil
+}

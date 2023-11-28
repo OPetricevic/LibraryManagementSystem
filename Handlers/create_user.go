@@ -17,8 +17,6 @@ type UserController struct {
 	jwtSecretKey []byte
 }
 
-// In handlers package
-
 func NewUserController(repo *repository.UserRepository, jwtSecretKey []byte) *UserController {
 	return &UserController{
 		Repo:         repo,

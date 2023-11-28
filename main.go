@@ -7,6 +7,7 @@ import (
 	"os"
 
 	handlers "github.com/OPetricevic/LibraryManagementSystem/Handlers"
+	middleware "github.com/OPetricevic/LibraryManagementSystem/Middleware"
 	models "github.com/OPetricevic/LibraryManagementSystem/Models"
 	repository "github.com/OPetricevic/LibraryManagementSystem/Repository"
 	"github.com/gorilla/mux"
@@ -50,12 +51,15 @@ func main() {
 
 	userRepo := repository.NewUserRepository(db)
 	userController := handlers.NewUserController(userRepo, jwtSecretKey)
+	adminController := handlers.NewAdminController(userRepo)
 
 	r := mux.NewRouter()
 	r.HandleFunc("/register", userController.Register).Methods("POST")
 	r.HandleFunc("/login", userController.Login).Methods("POST")
 
-	//	r.HandleFunc("/admin/users", adminController.GetAllUsers).Methods("GET").Use(JWTAdminAuthMiddleware)
+	adminRoute := r.PathPrefix("/admin").Subrouter()
+	adminRoute.Use(middleware.JWTAdminAuthMiddleware(jwtSecretKey))             // Apply JWT middleware to all admin routes
+	adminRoute.HandleFunc("/users", adminController.GetAllUsers).Methods("GET") // Register the GetAllUsers endpoint
 
 	fmt.Printf("Server is running")
 	err = http.ListenAndServe(":6666", r)
