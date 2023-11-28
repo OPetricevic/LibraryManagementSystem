@@ -33,7 +33,7 @@ func (uc *UserController) Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	tokenString, err := uc.generateJWTToken(user.ID)
+	tokenString, err := uc.generateJWTToken(user.ID, user.Role)
 	if err != nil {
 		http.Error(w, "Failed to generate JWT token", http.StatusInternalServerError)
 		return
@@ -49,15 +49,13 @@ func (uc *UserController) Login(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(response)
 }
 
-func (uc *UserController) generateJWTToken(userID string) (string, error) {
-	// Set up claims
-	claims := CustomClaims{
-		UserID: userID,
-		StandardClaims: jwt.StandardClaims{
-			ExpiresAt: time.Now().Add(1 * time.Hour).Unix(),
-			Issuer:    "LibraryManagementSystem",
-			IssuedAt:  time.Now().Unix(),
-		},
+func (uc *UserController) generateJWTToken(userID string, role string) (string, error) {
+	claims := jwt.MapClaims{
+		"user_id": userID,
+		"role":    role,
+		"exp":     time.Now().Add(24 * time.Hour).Unix(),
+		"iss":     "LibraryManagementSystem",
+		"iat":     time.Now().Unix(),
 	}
 
 	// Create a new token object with claims

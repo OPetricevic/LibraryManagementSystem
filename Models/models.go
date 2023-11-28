@@ -49,3 +49,7 @@ type AllUserInformation struct {
 	Email     string `json:"email"`
 	Role      string `json:"role"`
 }
+
+func (AllUserInformation) TableName() string {
+	return "users"
+}
