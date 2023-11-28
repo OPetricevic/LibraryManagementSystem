@@ -36,3 +36,8 @@ func (u *User) BeforeCreate(tx *gorm.DB) error {
 	}
 	return nil
 }
+
+type UpdateUser struct {
+	Email string `json:"email"`
+	Role  string `json:"role"`
+}
