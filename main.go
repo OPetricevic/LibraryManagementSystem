@@ -72,7 +72,7 @@ func main() {
 	adminRoute.HandleFunc("/users/{email}", adminController.GetUserByEmail).Methods("GET") // admin/users/dummyemail
 
 	adminRoute.HandleFunc("/users/{id}", adminController.UpdateUser).Methods("PUT", "PATCH") //admin/users/id
-	adminRoute.HandleFunc("/addBooks/", adminController.AddBook).Methods("POST")             //admin/addBooks
+	adminRoute.HandleFunc("/add_books", adminController.AddBook).Methods("POST")             //admin/addBooks
 
 	fmt.Printf("Server is running")
 	err = http.ListenAndServe(":6666", r)

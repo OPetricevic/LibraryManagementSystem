@@ -30,14 +30,14 @@ func (uc *UserController) Register(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "invalid request body", http.StatusBadRequest)
 		return
 	}
-	var errorMsgs []string // Declare the errorMsgs variable
+	var errorMsgs []string
 
-	// Check if the user information is in the correct format defined in models.go
+	// Checks if the user information is in the correct format defined in models.go
 	if _, err := govalidator.ValidateStruct(user); err != nil {
 		errorMsgs = append(errorMsgs, strings.Split(err.Error(), ";")...)
 	}
 
-	// Check if the password meets complexity requirements
+	// Checks if the password meets complexity requirements
 	if err := validatePassword(user.Password); err != nil {
 		errorMsgs = append(errorMsgs, "invalid password")
 	}
