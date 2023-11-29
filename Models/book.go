@@ -23,10 +23,8 @@ type Book struct {
 
 type BookCopy struct {
 	ID             uint       `gorm:"primaryKey" json:"id"`
-	BookID         uint       `json:"book_id"`                                    // Foreign key to the Book model
-	Status         string     `gorm:"not null;default:'available'" json:"status"` // e.g., Available, Checked Out, Reserved
-	Location       string     `json:"location"`                                   // Optional: location in the library
-	Condition      string     `json:"condition"`                                  // e.g., New, Good, Worn
+	BookID         uint       `json:"book_id"`
+	Status         string     `gorm:"not null;default:'available'" json:"status"`
 	CheckedOutDate *time.Time `json:"checked_out_date,omitempty"`
 	DueDate        *time.Time `json:"due_date,omitempty"`
 	ReturnedDate   *time.Time `json:"returned_date,omitempty"`
