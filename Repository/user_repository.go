@@ -2,6 +2,7 @@ package repository
 
 import (
 	"errors"
+	"strings"
 
 	models "github.com/OPetricevic/LibraryManagementSystem/Models"
 	"golang.org/x/crypto/bcrypt"
@@ -60,11 +61,17 @@ func (r *UserRepository) UpdateUserByID(userID string, updateData models.UserUpd
 		updates["role"] = updateData.Role
 	}
 	if updateData.Password != "" {
-		hashedPassword, err := bcrypt.GenerateFromPassword([]byte(updateData.Password), bcrypt.DefaultCost)
-		if err != nil {
-			return err
+		// Checking if the provided password is already hashed (during a password change request)
+		if !strings.HasPrefix(updateData.Password, "$2a$") {
+			// Hashing the password
+			hashedPassword, err := bcrypt.GenerateFromPassword([]byte(updateData.Password), bcrypt.DefaultCost)
+			if err != nil {
+				return err
+			}
+			updates["password"] = string(hashedPassword)
+		} else {
+			updates["password"] = updateData.Password
 		}
-		updates["password"] = string(hashedPassword)
 	}
 
 	return r.Db.Model(&models.User{}).Where("id = ?", userID).Updates(updates).Error

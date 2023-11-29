@@ -37,3 +37,7 @@ func (ac *adminController) AddBook(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusCreated)
 	json.NewEncoder(w).Encode(book)
 }
+
+func (ac *adminController) ListBooks(w http.ResponseWriter, r *http.Request) {
+
+}

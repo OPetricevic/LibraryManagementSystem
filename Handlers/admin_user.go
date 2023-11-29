@@ -46,14 +46,13 @@ func (ac *adminController) UpdateUser(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
+		hashedPassword, err := bcrypt.GenerateFromPassword([]byte(updateData.Password), bcrypt.DefaultCost)
+		if err != nil {
+			http.Error(w, "Failed to hash password", http.StatusInternalServerError)
+			return
+		}
+		updateData.Password = string(hashedPassword)
 	}
-	//I has the password, if it was updated.
-	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(updateData.Password), bcrypt.DefaultCost)
-	if err != nil {
-		http.Error(w, "Failed to hash password", http.StatusInternalServerError)
-		return
-	}
-	updateData.Password = string(hashedPassword)
 
 	if err := ac.Repo.UpdateUserByID(userID, updateData); err != nil {
 		http.Error(w, "Failed to update user", http.StatusInternalServerError)

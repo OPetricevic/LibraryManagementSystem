@@ -55,12 +55,19 @@ func main() {
 	adminController := handlers.NewAdminController(userRepo, bookRepo)
 
 	r := mux.NewRouter()
+
+	// Public routes
 	r.HandleFunc("/register", userController.Register).Methods("POST")
 	r.HandleFunc("/login", userController.Login).Methods("POST")
 
+	// User routes
+	userRoutes := r.PathPrefix("/").Subrouter()
+	userRoutes.Use(middleware.JWTUserAuthMiddleware(jwtSecretKey))
+
+	// Admin routes
 	adminRoute := r.PathPrefix("/admin").Subrouter()
-	adminRoute.Use(middleware.JWTAdminAuthMiddleware(jwtSecretKey))             // Apply JWT middleware to all admin routes
-	adminRoute.HandleFunc("/users", adminController.GetAllUsers).Methods("GET") // Register the GetAllUsers endpoint
+	adminRoute.Use(middleware.JWTAdminAuthMiddleware(jwtSecretKey))
+	adminRoute.HandleFunc("/users", adminController.GetAllUsers).Methods("GET")
 	adminRoute.HandleFunc("/users/{id}", adminController.UpdateUser).Methods("PUT", "PATCH")
 	// adminRoute.HandleFunc("/books/", adminController.CreateBook).Method("POST")
 
