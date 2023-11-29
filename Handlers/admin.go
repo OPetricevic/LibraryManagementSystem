@@ -11,11 +11,15 @@ import (
 )
 
 type adminController struct {
-	Repo *repository.UserRepository
+	Repo     *repository.UserRepository
+	BookRepo *repository.BookRepository
 }
 
-func NewAdminController(repo *repository.UserRepository) *adminController {
-	return &adminController{Repo: repo}
+func NewAdminController(repo *repository.UserRepository, bookRepo *repository.BookRepository) *adminController {
+	return &adminController{
+		Repo:     repo,
+		BookRepo: bookRepo,
+	}
 }
 
 func (ac *adminController) GetAllUsers(w http.ResponseWriter, r *http.Request) {

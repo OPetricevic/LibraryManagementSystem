@@ -50,8 +50,9 @@ func main() {
 	ensureAdminUserExists(db)
 
 	userRepo := repository.NewUserRepository(db)
+	bookRepo := repository.NewBookRepository(db)
 	userController := handlers.NewUserController(userRepo, jwtSecretKey)
-	adminController := handlers.NewAdminController(userRepo)
+	adminController := handlers.NewAdminController(userRepo, bookRepo)
 
 	r := mux.NewRouter()
 	r.HandleFunc("/register", userController.Register).Methods("POST")
