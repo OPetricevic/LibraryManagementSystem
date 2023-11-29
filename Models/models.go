@@ -56,3 +56,6 @@ type UserUpdateRequest struct {
 	Role      string `json:"role,omitempty"`
 	Password  string `json:"password,omitempty"`
 }
+
+type Book struct {
+}
