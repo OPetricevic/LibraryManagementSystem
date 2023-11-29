@@ -33,11 +33,15 @@ func (ac *adminController) GetAllUsers(w http.ResponseWriter, r *http.Request) {
 }
 
 func (ac *adminController) GetUserByEmail(w http.ResponseWriter, r *http.Request) {
-	user, err := ac.Repo.GetUserByEmail()
+	vars := mux.Vars(r)
+	email := vars["email"]
+
+	user, err := ac.Repo.GetUserByEmail(email)
 	if err != nil {
 		http.Error(w, "Failed to get user by email", http.StatusInternalServerError)
 		return
 	}
+
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(user)
 }

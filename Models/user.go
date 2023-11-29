@@ -37,6 +37,11 @@ func (u *User) BeforeCreate(tx *gorm.DB) error {
 	return nil
 }
 
+// Using it for searching users by email
+type UserEmail struct {
+	Email string `json:"email"`
+}
+
 type AllUserInformation struct {
 	ID        string `json:"id"`
 	FirstName string `json:"first_name"`

@@ -42,7 +42,7 @@ func main() {
 		log.Fatal("Failed to connect to the database:", err)
 	}
 
-	err = db.AutoMigrate(&models.User{})
+	err = db.AutoMigrate(&models.User{}, &models.Category{}, &models.Book{}, &models.BookCopy{})
 	if err != nil {
 		log.Fatal("Failed to automigrate", err)
 	}
@@ -67,9 +67,12 @@ func main() {
 	// Admin routes
 	adminRoute := r.PathPrefix("/admin").Subrouter()
 	adminRoute.Use(middleware.JWTAdminAuthMiddleware(jwtSecretKey))
-	adminRoute.HandleFunc("/users", adminController.GetAllUsers).Methods("GET")
-	adminRoute.HandleFunc("/users/{id}", adminController.UpdateUser).Methods("PUT", "PATCH")
-	// adminRoute.HandleFunc("/books/", adminController.CreateBook).Method("POST")
+
+	adminRoute.HandleFunc("/users", adminController.GetAllUsers).Methods("GET")            //admin/users
+	adminRoute.HandleFunc("/users/{email}", adminController.GetUserByEmail).Methods("GET") // admin/users/dummyemail
+
+	adminRoute.HandleFunc("/users/{id}", adminController.UpdateUser).Methods("PUT", "PATCH") //admin/users/id
+	adminRoute.HandleFunc("/addBooks/", adminController.AddBook).Methods("POST")             //admin/addBooks
 
 	fmt.Printf("Server is running")
 	err = http.ListenAndServe(":6666", r)
