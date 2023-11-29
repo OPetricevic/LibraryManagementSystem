@@ -32,6 +32,16 @@ func (ac *adminController) GetAllUsers(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(users)
 }
 
+func (ac *adminController) GetUserByEmail(w http.ResponseWriter, r *http.Request) {
+	user, err := ac.Repo.GetUserByEmail()
+	if err != nil {
+		http.Error(w, "Failed to get user by email", http.StatusInternalServerError)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(user)
+}
+
 func (ac *adminController) UpdateUser(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	userID := vars["id"]
