@@ -22,7 +22,7 @@ func validateBookData(book *models.Book) error {
 	}
 
 	if len(validationErrors) > 0 {
-		return errors.New(strings.Join(validationErrors, "; "))
+		return errors.New("Invalid book data:\n" + strings.Join(validationErrors, "\n"))
 	}
 
 	return nil

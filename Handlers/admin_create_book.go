@@ -2,10 +2,12 @@ package handlers
 
 import (
 	"encoding/json"
+	"errors"
 	"net/http"
 	"strings"
 
 	models "github.com/OPetricevic/LibraryManagementSystem/Models"
+	"gorm.io/gorm"
 )
 
 func (ac *adminController) AddBook(w http.ResponseWriter, r *http.Request) {
@@ -13,6 +15,23 @@ func (ac *adminController) AddBook(w http.ResponseWriter, r *http.Request) {
 	if err := json.NewDecoder(r.Body).Decode(&book); err != nil {
 		http.Error(w, "Invalid request body: "+err.Error(), http.StatusBadRequest)
 		return
+	}
+	if err := validateBookData(&book); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	if book.Category.Name != "" {
+		var category models.Category
+		result := ac.BookRepo.Db.First(&category, "name = ?", book.Category.Name)
+
+		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+			category = models.Category{Name: book.Category.Name}
+			ac.BookRepo.Db.Create(&category)
+		}
+		book.CategoryID = category.ID
+	} else {
+		book.CategoryID = ac.BookRepo.GetOrCreateUncategorizedCategory().ID
 	}
 
 	if err := ac.BookRepo.AddBook(&book); err != nil {
@@ -29,8 +48,8 @@ func (ac *adminController) AddBook(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if len(addCopyErrors) > 0 {
-		errorMsg := "Failed to add some book copies: " + strings.Join(addCopyErrors, "; ")
-		http.Error(w, errorMsg, http.StatusInternalServerError)
+		errorMsg := "Invalid book data:\n" + strings.Join(addCopyErrors, ";\n") + ";\n"
+		http.Error(w, errorMsg, http.StatusBadRequest)
 		return
 	}
 

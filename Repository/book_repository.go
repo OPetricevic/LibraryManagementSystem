@@ -1,6 +1,8 @@
 package repository
 
 import (
+	"errors"
+
 	models "github.com/OPetricevic/LibraryManagementSystem/Models"
 	"gorm.io/gorm"
 )
@@ -28,4 +30,14 @@ func (r *BookRepository) ListBooks() ([]models.Book, error) {
 		return nil, result.Error
 	}
 	return books, nil
+}
+func (r *BookRepository) GetOrCreateUncategorizedCategory() *models.Category {
+	var category models.Category
+
+	result := r.Db.First(&category, "name = ?", "uncategorized")
+	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+		category = models.Category{Name: "uncategorized"}
+		r.Db.Create(&category)
+	}
+	return &category
 }

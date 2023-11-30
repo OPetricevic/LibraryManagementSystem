@@ -12,16 +12,17 @@ type Book struct {
 	Author      string   `json:"author"`
 	ISBN        string   `gorm:"unique;not null" json:"isbn"`
 	Description string   `json:"description"`
-	CategoryID  uint     `json:"category_id"`
-	Category    Category `json:"category"`
+	CategoryID  uint     `gorm:"not null" json:"category_id"`
+	Category    Category `gorm:"foreignKey:CategoryID" json:"category"`
 	Status      string   `gorm:"not null;default:'available'" json:"status"`
 	Quantity    int      `gorm:"not null" json:"quantity"`
 }
 
 type Category struct {
 	gorm.Model
-	Name        string `gorm:"unique;not null" json:"name"`
+	Name        string `gorm:"unique;not null"default:'uncategorized json:"name"`
 	Description string `json:"description"`
+	Books       []Book `gorm:"foreignKey:CategoryID" json:"books"`
 }
 
 type BookCopy struct {
