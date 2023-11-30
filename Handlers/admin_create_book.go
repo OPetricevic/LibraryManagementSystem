@@ -2,12 +2,10 @@ package handlers
 
 import (
 	"encoding/json"
-	"errors"
 	"net/http"
 	"strings"
 
 	models "github.com/OPetricevic/LibraryManagementSystem/Models"
-	"gorm.io/gorm"
 )
 
 func (ac *adminController) AddBook(w http.ResponseWriter, r *http.Request) {
@@ -16,29 +14,22 @@ func (ac *adminController) AddBook(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Invalid request body: "+err.Error(), http.StatusBadRequest)
 		return
 	}
-	if err := validateBookData(&book); err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+
+	// Find or create the category
+	category, err := ac.BookRepo.FindOrCreateCategory(book.TempCategoryName)
+	if err != nil {
+		http.Error(w, "Failed to find or create category: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
+	book.CategoryID = category.ID
 
-	if book.Category.Name != "" {
-		var category models.Category
-		result := ac.BookRepo.Db.First(&category, "name = ?", book.Category.Name)
-
-		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
-			category = models.Category{Name: book.Category.Name}
-			ac.BookRepo.Db.Create(&category)
-		}
-		book.CategoryID = category.ID
-	} else {
-		book.CategoryID = ac.BookRepo.GetOrCreateUncategorizedCategory().ID
-	}
-
+	// Add book to the database
 	if err := ac.BookRepo.AddBook(&book); err != nil {
 		http.Error(w, "Failed to add book: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
 
+	// Add book copies logic
 	var addCopyErrors []string
 	for i := 0; i < book.Quantity; i++ {
 		bookCopy := models.BookCopy{BookID: book.ID, Status: "available"}
@@ -47,9 +38,10 @@ func (ac *adminController) AddBook(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
+	// Handle errors in adding book copies
 	if len(addCopyErrors) > 0 {
-		errorMsg := "Invalid book data:\n" + strings.Join(addCopyErrors, ";\n") + ";\n"
-		http.Error(w, errorMsg, http.StatusBadRequest)
+		errorMsg := "Failed to add some book copies: " + strings.Join(addCopyErrors, "; ")
+		http.Error(w, errorMsg, http.StatusInternalServerError)
 		return
 	}
 

@@ -41,3 +41,11 @@ func (r *BookRepository) GetOrCreateUncategorizedCategory() *models.Category {
 	}
 	return &category
 }
+
+func (r *BookRepository) FindOrCreateCategory(categoryName string) (models.Category, error) {
+	var category models.Category
+	if result := r.Db.Where("name = ?", categoryName).FirstOrCreate(&category, models.Category{Name: categoryName}); result.Error != nil {
+		return models.Category{}, result.Error
+	}
+	return category, nil
+}

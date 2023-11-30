@@ -8,19 +8,19 @@ import (
 
 type Book struct {
 	gorm.Model
-	Title       string   `gorm:"not null" json:"title"`
-	Author      string   `json:"author"`
-	ISBN        string   `gorm:"unique;not null" json:"isbn"`
-	Description string   `json:"description"`
-	CategoryID  uint     `gorm:"not null" json:"category_id"`
-	Category    Category `gorm:"foreignKey:CategoryID" json:"category"`
-	Status      string   `gorm:"not null;default:'available'" json:"status"`
-	Quantity    int      `gorm:"not null" json:"quantity"`
+	Title            string `gorm:"not null" json:"title"`
+	Author           string `json:"author"`
+	ISBN             string `gorm:"unique;not null" json:"isbn"`
+	Description      string `json:"description"`
+	CategoryID       uint   `gorm:"not null" json:"category_id"`
+	TempCategoryName string `json:"category" gorm:"-"`
+	Status           string `gorm:"not null;default:'available'" json:"status"`
+	Quantity         int    `gorm:"not null" json:"quantity"`
 }
 
 type Category struct {
 	gorm.Model
-	Name        string `gorm:"unique;not null"default:'uncategorized json:"name"`
+	Name        string `gorm:"unique;not null" json:"name"`
 	Description string `json:"description"`
 	Books       []Book `gorm:"foreignKey:CategoryID" json:"books"`
 }
