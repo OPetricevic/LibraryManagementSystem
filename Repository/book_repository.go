@@ -49,3 +49,12 @@ func (r *BookRepository) FindOrCreateCategory(categoryName string) (models.Categ
 	}
 	return category, nil
 }
+
+func (r *UserRepository) GetBooks() ([]models.Book, error) {
+	var books []models.Book
+	result := r.Db.Find(&books)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	return books, nil
+}
