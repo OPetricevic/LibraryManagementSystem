@@ -52,3 +52,7 @@ func (ac *adminController) AddBook(w http.ResponseWriter, r *http.Request) {
 func (ac *adminController) ListBooks(w http.ResponseWriter, r *http.Request) {
 
 }
+
+func (ac *adminController) GetBookByCategory(w http.ResponseWriter, r *http.Request) {
+
+}
