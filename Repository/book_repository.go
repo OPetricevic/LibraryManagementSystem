@@ -61,10 +61,9 @@ func (r *BookRepository) GetBooks(page int, pageSize int) ([]models.Book, error)
 	return books, nil
 }
 
-// Gets All Books through Category
-func (r *BookRepository) GetBookByCategory(categoryName string) ([]models.Book, error) {
+func (r *BookRepository) GetBooksByCategory(categoryName string) ([]models.Book, error) {
 	var books []models.Book
-	result := r.Db.Preload("Category").Where("categories.name = ?", categoryName).Joins("JOIN categories ON categories.id = books.category_id").Find(&books)
+	result := r.Db.Preload("Category").Joins("Category").Where("categories.name = ?", categoryName).Find(&books)
 	if result.Error != nil {
 		return nil, result.Error
 	}

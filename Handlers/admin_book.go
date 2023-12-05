@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	models "github.com/OPetricevic/LibraryManagementSystem/Models"
+	"github.com/gorilla/mux"
 )
 
 func (ac *adminController) AddBook(w http.ResponseWriter, r *http.Request) {
@@ -54,9 +55,10 @@ func (ac *adminController) ListBooks(w http.ResponseWriter, r *http.Request) {
 }
 
 func (ac *adminController) GetBooksByCategory(w http.ResponseWriter, r *http.Request) {
-	category := r.URL.Query().Get("category")
+	vars := mux.Vars(r)
+	categoryName := vars["category"]
 
-	books, err := ac.BookRepo.GetBooksByCategory(category)
+	books, err := ac.BookRepo.GetBooksByCategory(categoryName)
 	if err != nil {
 		http.Error(w, "Failed to get books: "+err.Error(), http.StatusInternalServerError)
 		return

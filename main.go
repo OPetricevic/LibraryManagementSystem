@@ -74,7 +74,7 @@ func main() {
 	adminRoute.HandleFunc("/users/{id}", adminController.UpdateUser).Methods("PUT", "PATCH") //admin/users/id
 	adminRoute.HandleFunc("/add_books", adminController.AddBook).Methods("POST")             //admin/addBooks
 	adminRoute.HandleFunc("/books", adminController.ListBooks).Methods("GET")
-	adminRoute.HandleFunc("books/category/{category}", adminController.GetBookByCategory).Methods("GET") // lists category books.
+	adminRoute.HandleFunc("/books/category/{category}", adminController.GetBooksByCategory).Methods("GET")
 
 	fmt.Printf("Server is running")
 	err = http.ListenAndServe(":6666", r)
